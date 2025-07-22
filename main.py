@@ -5,6 +5,7 @@ class ChainReactionGame(arcade.Window):
     def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
         arcade.set_background_color(arcade.color.DARK_SLATE_GRAY)
+        self.board = [[Cell(row, col) for col in range(COLS)] for row in range(ROWS)]
 
     def setup(self):
         self.title_text = arcade.Text(
@@ -37,19 +38,52 @@ class ChainReactionGame(arcade.Window):
         return None
 
     def on_mouse_press(self, x, y, button, modifiers):
-        print(f"Mouse clicked at: ({x}, {y})")
-        cell = self.get_cell_from_mouse(x, y)
-        if cell:
-            col, row = cell
-            print(f"Clicked cell: ({col}, {row})")
-        else:
-            print("Clicked outside board.")
+        cell_pos = self.get_cell_from_mouse(x, y)
+        if cell_pos:
+            col, row = cell_pos
+            self.board[row][col].add_atom()
+
 
 
     def on_draw(self):
         self.clear()
         self.title_text.draw()
         self.draw_grid()
+
+        for row in range(ROWS):
+            for col in range(COLS):
+                cell = self.board[row][col]
+                x = col * COL_SIZE + COL_SIZE // 2 + OFFSET
+                y = row * ROW_SIZE + ROW_SIZE // 2 + OFFSET
+
+                if cell.atom_count == 1:
+                    arcade.draw_circle_filled(x, y, 6, arcade.color.GRAY)
+                if cell.atom_count == 2:
+                    arcade.draw_circle_filled(x - 10, y, 6, arcade.color.GRAY)
+                    arcade.draw_circle_filled(x + 10, y, 6, arcade.color.GRAY)
+                if cell.atom_count == 3:
+                    arcade.draw_circle_filled(x - 10, y - 10, 6, arcade.color.GRAY)
+                    arcade.draw_circle_filled(x + 10, y - 10, 6, arcade.color.GRAY)
+                    arcade.draw_circle_filled(x, y + 10, 6, arcade.color.GRAY)
+                if cell.atom_count == 4:
+                    arcade.draw_circle_filled(x - 10, y - 10, 6, arcade.color.GRAY)
+                    arcade.draw_circle_filled(x + 10, y - 10, 6, arcade.color.GRAY)
+                    arcade.draw_circle_filled(x - 10, y + 10, 6, arcade.color.GRAY)
+                    arcade.draw_circle_filled(x + 10, y + 10, 6, arcade.color.GRAY)
+
+
+
+class Cell:
+    def __init__(self, row, col):
+        self.row = row
+        self.col = col
+        self.atom_count = 0
+
+    def add_atom(self):
+        if self.atom_count < 4:
+            self.atom_count += 1
+
+
 
 if __name__ == "__main__":
     game = ChainReactionGame()
