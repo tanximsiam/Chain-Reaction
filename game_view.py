@@ -166,11 +166,12 @@ class GameView(gui.UIView):
             atom.position = (x + dx, y + dy)
 
     def tint_tiles(self):
-        player = PLAYER_COLORS[self.game.turn]
+        # Opaque blend: an RGB colour set later keeps a sprite's old alpha, so a translucent tint would stick.
+        highlight = tuple(round(c + (p - c) * 0.3) for c, p in zip(CELL_COLOR, PLAYER_COLORS[self.game.turn]))
         for i, tile in enumerate(self.tiles):
             r, c = divmod(i, COLS)
             legal = not self.busy and (r, c) == self.hover and self.game.board.can_place(r, c, self.game.turn)
-            tile.color = (*player, 90) if legal else CELL_COLOR
+            tile.color = (*(highlight if legal else CELL_COLOR), 255)
 
     def on_mouse_motion(self, x, y, dx, dy):
         self.hover = self.cell_at(x, y)
