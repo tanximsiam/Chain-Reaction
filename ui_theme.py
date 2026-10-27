@@ -16,9 +16,12 @@ INK = (2, 6, 23)         # slate 950, used to darken
 WHITE = (255, 255, 255)
 SUPERSAMPLE = 4
 
+ACCENT = (239, 68, 68)   # red 500, same as the REACTION title
+
 # Button variants: face, hovered face, content colour.
-# Dark UI: primary actions and selected options are light with dark text.
 VARIANTS = {
+    # Main calls to action and selected options. White on red 500 is 3.8:1, fine for the bold 17px+ labels used.
+    "accent": (ACCENT, (220, 38, 38), WHITE),
     "primary": ((241, 245, 249), (255, 255, 255), (15, 23, 42)),
     "secondary": ((51, 65, 85), (71, 85, 105), TEXT),
     "raised": ((71, 85, 105), (100, 116, 139), TEXT),  # secondary on a slate 800 panel

@@ -5,7 +5,7 @@ from board import Game
 from board_sprites import BoardSprites
 from constants import *
 from menu_view import MenuView
-from ui_theme import FONT, TITLE_FONT
+from ui_theme import FONT, TEXT as TEXT_COLOR, TITLE_FONT
 from widgets import BevelButton, Tooltip, audio_toggle, panel
 import audio
 
@@ -37,17 +37,46 @@ class GameView(gui.UIView):
         root.add(info, anchor_x="left", anchor_y="top", align_x=MARGIN, align_y=-MARGIN)
 
         actions = gui.UIBoxLayout(vertical=False, space_between=8)
-        buttons = [audio_toggle("sound", width=42, height=42), audio_toggle("music", width=42, height=42)]
-        for icon, tooltip, action in (("restart", "Restart  R", self.restart), ("menu", "Menu  Esc", self.to_menu)):
-            button = BevelButton(icon=icon, width=42, height=42, tooltip=tooltip)
+        buttons = []
+        for icon, tooltip, action in (("restart", "Restart  R", self.restart), ("pause", "Pause  Esc", self.pause)):
+            button = actions.add(BevelButton(icon=icon, width=42, height=42, tooltip=tooltip))
             button.on_click = lambda event, action=action: action()
             buttons.append(button)
-        for button in buttons:
-            actions.add(button)
         root.add(actions, anchor_x="right", anchor_y="top", align_x=-MARGIN, align_y=-MARGIN + 4)
         # Floats under the buttons, over the roster, only while a button is hovered.
         self.tooltip = root.add(Tooltip(buttons), anchor_x="right", anchor_y="top", align_x=-MARGIN, align_y=-72)
+        self.pause_menu = self.add_widget(self.build_pause_menu())
+        self.pause_menu.visible = False
         self.update_hud()
+
+    def build_pause_menu(self):
+        card = gui.UIBoxLayout(space_between=10)
+        card.add(gui.UILabel("PAUSED", font_name=TITLE_FONT, font_size=26, text_color=TEXT_COLOR))
+        card.add(gui.UISpace(height=8))
+        for text, icon, variant, action in (("Resume", "play", "accent", self.resume),
+                                            ("Main menu", "menu", "raised", self.to_menu),
+                                            ("Exit to desktop", "exit", "raised", arcade.exit)):
+            button = card.add(BevelButton(text, icon=icon, width=230, height=50, variant=variant, radius=14))
+            button.on_click = lambda event, action=action: action()
+        toggles = card.add(gui.UIBoxLayout(vertical=False, space_between=10))
+        for kind in ("sound", "music"):
+            toggles.add(audio_toggle(kind, labelled=True, width=110, height=46, variant="raised"))
+        overlay = gui.UIAnchorLayout()
+        overlay.add(panel(card, padding=28))
+        return overlay
+
+    @property
+    def paused(self):
+        return self.pause_menu.visible
+
+    def pause(self):
+        if self.game.winner is None:
+            self.hud.visible = False
+            self.pause_menu.visible = True
+
+    def resume(self):
+        self.pause_menu.visible = False
+        self.hud.visible = True
 
     def update_hud(self):
         game = self.game
@@ -69,9 +98,9 @@ class GameView(gui.UIView):
                              text_color=MUTED_TEXT))
         card.add(gui.UISpace(height=6))
         buttons = card.add(gui.UIBoxLayout(vertical=False, space_between=10))
-        again = buttons.add(BevelButton("Play again", icon=None, width=140, height=50, variant="primary"))
+        again = buttons.add(BevelButton("Play again", icon="restart", width=150, height=50, variant="accent"))
         again.on_click = lambda event: self.restart()
-        menu = buttons.add(BevelButton("Menu", width=110, height=50, variant="raised"))
+        menu = buttons.add(BevelButton("Main menu", icon="menu", width=150, height=50, variant="raised"))
         menu.on_click = lambda event: self.to_menu()
         overlay.add(panel(card, padding=32))
         self.add_widget(overlay)
@@ -83,14 +112,14 @@ class GameView(gui.UIView):
         self.window.show_view(MenuView(self.players))
 
     def on_key_press(self, symbol, modifiers):
-        if symbol == arcade.key.R:
+        if symbol in (arcade.key.ESCAPE, arcade.key.P):
+            self.resume() if self.paused else self.pause()
+        elif symbol == arcade.key.R and not self.paused:
             self.restart()
-        elif symbol == arcade.key.ESCAPE:
-            self.to_menu()
 
     @property
     def busy(self):
-        return self.resolving or self.game.winner is not None
+        return self.resolving or self.paused or self.game.winner is not None
 
     def update_highlight(self):
         legal = not self.busy and self.hover and self.game.board.can_place(*self.hover, self.game.turn)
@@ -115,6 +144,8 @@ class GameView(gui.UIView):
 
     def on_update(self, delta_time):
         self.tooltip.refresh()
+        if self.paused:
+            return  # freeze explosions and spinning
         if self.board.update(delta_time):
             self.game.update_alive()
         if self.resolving and not self.board.animating:
@@ -136,5 +167,5 @@ class GameView(gui.UIView):
 
     def on_draw_before_ui(self):
         self.board.draw()
-        if self.game.winner is not None:
+        if self.paused or self.game.winner is not None:
             self.dim.draw()

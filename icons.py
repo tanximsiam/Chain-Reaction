@@ -69,6 +69,11 @@ def _draw(name, d):
     elif name == "exit":
         arc(12, 13, 8, -60, 240)
         line((12, 2.5), (12, 11))
+    elif name == "pause":
+        line((9, 6), (9, 18))
+        line((15, 6), (15, 18))
+    elif name == "play":
+        d.polygon([p(8, 5), p(19.5, 12), p(8, 19)], fill="white")
     elif name == "back":
         line((19, 12), (5, 12))
         line((11, 6), (5, 12), (11, 18))
