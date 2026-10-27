@@ -4,14 +4,14 @@
   font-display: swap;
 }
 @font-face {
-  font-family: "Liberation Sans";
-  src: url("fonts/Liberation_Sans_Regular.ttf") format("truetype");
+  font-family: "Rubik";
+  src: url("fonts/Rubik-Regular.woff2") format("woff2");
   font-weight: 400;
   font-display: swap;
 }
 @font-face {
-  font-family: "Liberation Sans";
-  src: url("fonts/Liberation_Sans_Bold.ttf") format("truetype");
+  font-family: "Rubik";
+  src: url("fonts/Rubik-Bold.woff2") format("woff2");
   font-weight: 700;
   font-display: swap;
 }
@@ -39,9 +39,9 @@
   --cell-r: 25%;
   --radius: 14px;
 
-  --display: "Kenney Future", "Liberation Sans", Arial, sans-serif;
+  --display: "Kenney Future", "Rubik", Arial, sans-serif;
   /* Both faces ship with the site, so the page matches the game on every OS. */
-  --text: "Liberation Sans", Arial, Helvetica, sans-serif;
+  --text: "Rubik", Arial, Helvetica, sans-serif;
   /* Kenney Future is very wide (about 0.9em per letter), so display sizes sit lower than usual. */
   --step-1: clamp(40px, 5.4vw, 88px);
   --step-2: clamp(30px, 3.6vw, 60px);
@@ -225,7 +225,7 @@ code, pre { font-family: ui-monospace, "Ubuntu Mono", Consolas, monospace; font-
   margin-top: 56px;
 }
 .shot { margin: 0; }
-.shot img { width: 100%; border-radius: 6.5% / 3.9%; background: var(--surface); }
+.shot img, .shot video { display: block; width: 100%; height: auto; border-radius: 6.5% / 3.9%; background: var(--surface); }
 .shot figcaption { margin-top: 14px; font-size: var(--step-5); color: var(--soft); max-width: 32ch; }
 .shot-main { grid-row: span 2; }
 .shot-main figcaption { color: var(--ink); font-size: 17px; }
@@ -344,8 +344,8 @@ code, pre { font-family: ui-monospace, "Ubuntu Mono", Consolas, monospace; font-
 /* Motion: entrances are opt-in (html.js), so content never stays hidden without script. */
 .js .reveal { opacity: 0; translate: 0 24px; transition: opacity 600ms var(--ease-out), translate 600ms var(--ease-out); }
 .js .reveal.in { opacity: 1; translate: 0 0; }
-.js .shot-main img { clip-path: inset(0 0 100% 0); scale: 1.12; transition: clip-path 1.1s var(--ease-out), scale 1.1s var(--ease-out); }
-.js .shot-main.in img { clip-path: inset(0 0 0 0); scale: 1; }
+.js .shot-main video { clip-path: inset(0 0 100% 0); scale: 1.12; transition: clip-path 1.1s var(--ease-out), scale 1.1s var(--ease-out); }
+.js .shot-main.in video { clip-path: inset(0 0 0 0); scale: 1; }
 .js .hero-copy > * { animation: rise 700ms var(--ease-out) both; }
 .js .hero-copy > :nth-child(2) { animation-delay: 80ms; }
 .js .hero-copy > :nth-child(3) { animation-delay: 160ms; }
@@ -356,7 +356,7 @@ code, pre { font-family: ui-monospace, "Ubuntu Mono", Consolas, monospace; font-
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition-duration: 1ms !important; }
-  .js .reveal, .js .shot-main img { opacity: 1; translate: none; clip-path: none; scale: 1; }
+  .js .reveal, .js .shot-main video { opacity: 1; translate: none; clip-path: none; scale: 1; }
 }
 
 /* Tablet: the 2 : 3 : 4 bar and the keys box are too narrow side by side. */
