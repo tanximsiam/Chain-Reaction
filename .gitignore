@@ -17,3 +17,7 @@ Thumbs.db
 
 #Loader script
 dev_runner.py
+
+# PyInstaller output
+build/
+dist/
