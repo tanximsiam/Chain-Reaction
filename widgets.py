@@ -10,6 +10,7 @@ DEPTH = 4                         # resting height of the face above its lip, in
 STIFFNESS, DAMPING = 900.0, 26.0  # underdamped spring: the face overshoots a little on release
 PRESS_KICK = -260.0               # px/s; makes even a very fast click visibly sink
 CAP_HEIGHT = 0.69                 # Liberation Sans cap height, in em
+ICON_GAP = 8
 
 
 class BevelButton(gui.UIInteractiveWidget):
@@ -25,7 +26,7 @@ class BevelButton(gui.UIInteractiveWidget):
         self.lift = float(DEPTH)
         self.velocity = 0.0
         self.label = arcade.Text(text, 0, 0, font_name=FONT, font_size=font_size,
-                                 bold=variant == "primary", anchor_x="center", anchor_y="baseline")
+                                 bold=variant in ("primary", "accent"), anchor_x="center", anchor_y="baseline")
         bind(self, "pressed", self._on_pressed)
         bind(self, "hovered", self.trigger_render)
 
@@ -36,7 +37,7 @@ class BevelButton(gui.UIInteractiveWidget):
     @variant.setter
     def variant(self, value):
         self._variant = value
-        self.label.bold = value == "primary"
+        self.label.bold = value in ("primary", "accent")
         self.trigger_render()
 
     def set_icon(self, icon):
@@ -69,13 +70,17 @@ class BevelButton(gui.UIInteractiveWidget):
         rounded_patch(lerp(face, INK, 0.5), self.radius).draw_rect(rect=arcade.LBWH(0, 0, w, body))
         rounded_patch(color, self.radius, lerp(color, WHITE, 0.2)).draw_rect(rect=arcade.LBWH(0, lift, w, body))
 
-        cx, cy = w / 2, lift + body / 2
+        # Icon and label are centred together as one group.
+        size = round(min(body * 0.55, 22)) if self.icon else 0
+        text_width = self.label.content_width if self.label.text else 0
+        x = (w - size - text_width - (ICON_GAP if size and text_width else 0)) / 2
+        cy = lift + body / 2
         if self.icon:
-            size = round(min(body * 0.55, 22))
-            surface.draw_texture(cx - size / 2, cy - size / 2, size, size, icon_texture(self.icon, content, size))
+            surface.draw_texture(x, cy - size / 2, size, size, icon_texture(self.icon, content, size))
+            x += size + ICON_GAP
         if self.label.text:
             # Centre on cap height; anchor_y="center" centres the full ascender-descender box, which reads high.
-            self.label.position = (cx, cy - CAP_HEIGHT * self.label.font_size * 96 / 72 / 2)
+            self.label.position = (x + text_width / 2, cy - CAP_HEIGHT * self.label.font_size * 96 / 72 / 2)
             self.label.color = content
             self.label.draw()
 
@@ -85,12 +90,12 @@ def panel(child, padding=28, radius=20, color=(30, 41, 59)):
     return child.with_background(texture=rounded_patch(color, radius)).with_padding(all=padding)
 
 
-def audio_toggle(kind, **kwargs):
-    """Icon button that turns "sound" or "music" on and off."""
+def audio_toggle(kind, labelled=False, **kwargs):
+    """Icon button that turns "sound" or "music" on and off; `labelled` adds the word next to the icon."""
     def tooltip():
         return f"{kind.capitalize()} {'on' if audio.settings[kind] else 'off'}"
 
-    button = BevelButton(icon=audio.icon(kind), tooltip=tooltip(), **kwargs)
+    button = BevelButton(kind.capitalize() if labelled else "", icon=audio.icon(kind), tooltip=tooltip(), **kwargs)
 
     def click(event):
         audio.toggle(kind)

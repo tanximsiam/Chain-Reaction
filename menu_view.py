@@ -26,7 +26,7 @@ class MenuView(gui.UIView):
         column.add(row)
 
         column.add(gui.UISpace(height=20))
-        play = column.add(BevelButton("Play", width=200, height=56, variant="primary", font_size=17, radius=14))
+        play = column.add(BevelButton("Play", width=200, height=56, variant="accent", font_size=17, radius=14))
         play.on_click = lambda event: self.start()
         column.add(gui.UISpace(height=28))
         column.add(gui.UILabel(
@@ -49,7 +49,7 @@ class MenuView(gui.UIView):
     def select(self, n):
         self.players = n
         for count, button in self.count_buttons.items():
-            button.variant = "primary" if count == n else "secondary"
+            button.variant = "accent" if count == n else "secondary"
 
     def start(self):
         from game_view import GameView  # avoid circular import: GameView links back here

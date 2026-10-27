@@ -34,7 +34,7 @@ Open http://localhost:8765 to play the game in a browser. It restarts whenever a
 | Menu | Enter or Space | Start |
 | Game | Click a cell | Place an atom |
 | Game | R | Restart |
-| Game | Esc | Back to menu |
+| Game | Esc or P | Pause / resume (pause menu: Resume, Main menu, Exit to desktop, Sound, Music) |
 
 ## Code layout
 
