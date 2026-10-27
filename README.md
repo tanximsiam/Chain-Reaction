@@ -15,7 +15,7 @@ Push a cell past its limit and it bursts into its neighbours, taking them over.
 </p>
 
 <p align="center">
-<img src="site/img/chain.webp" width="260" alt="Recorded gameplay: one atom in a corner sets off a chain across the board">
+<img src="site/img/game.png" width="260" alt="A four-player game in progress">
 <img src="site/img/menu.png" width="260" alt="Start menu with player count and Play button">
 <img src="site/img/pause.png" width="260" alt="Pause menu with Resume, Main menu, Exit to desktop, Sound and Music">
 </p>
