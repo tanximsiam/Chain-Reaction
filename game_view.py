@@ -7,7 +7,8 @@ from PIL import Image, ImageDraw
 from board import Game
 from constants import *
 from menu_view import MenuView
-from ui_theme import FONT, PRIMARY, RAISED, SMALL, TITLE_FONT
+from ui_theme import FONT, TITLE_FONT
+from widgets import BevelButton, panel
 
 ELIMINATED = (71, 85, 105)  # slate 600
 
@@ -75,12 +76,16 @@ class GameView(gui.UIView):
                        for p in range(self.players)]
         root.add(info, anchor_x="left", anchor_y="top", align_x=MARGIN, align_y=-MARGIN)
 
-        actions = gui.UIBoxLayout(vertical=False, space_between=8)
-        restart = actions.add(gui.UIFlatButton(text="Restart", width=76, height=32, style=SMALL))
-        restart.on_click = lambda event: self.restart()
-        menu = actions.add(gui.UIFlatButton(text="Menu", width=64, height=32, style=SMALL))
-        menu.on_click = lambda event: self.to_menu()
-        root.add(actions, anchor_x="right", anchor_y="top", align_x=-MARGIN, align_y=-MARGIN)
+        side = gui.UIBoxLayout(space_between=6, align="right")
+        actions = side.add(gui.UIBoxLayout(vertical=False, space_between=8))
+        self.icon_buttons = []
+        for icon, tooltip, action in (("restart", "Restart  R", self.restart), ("menu", "Menu  Esc", self.to_menu)):
+            button = actions.add(BevelButton(icon=icon, width=42, height=42, tooltip=tooltip))
+            button.on_click = lambda event, action=action: action()
+            self.icon_buttons.append(button)
+        self.hint = side.add(gui.UILabel("", font_name=FONT, font_size=11, text_color=MUTED_TEXT,
+                                         width=150, align="right"))
+        root.add(side, anchor_x="right", anchor_y="top", align_x=-MARGIN, align_y=-MARGIN + 4)
         self.update_hud()
 
     def update_hud(self):
@@ -96,18 +101,18 @@ class GameView(gui.UIView):
         winner = self.game.winner
         self.hud.visible = False
         overlay = gui.UIAnchorLayout()
-        panel = gui.UIBoxLayout(space_between=14).with_background(color=CELL_COLOR).with_padding(all=32)
-        panel.add(gui.UILabel(f"{PLAYER_NAMES[winner].upper()} WINS", font_name=TITLE_FONT, font_size=26,
-                              text_color=PLAYER_COLORS[winner]))
-        panel.add(gui.UILabel("Every other atom has been captured.", font_name=FONT, font_size=12,
-                              text_color=MUTED_TEXT))
-        panel.add(gui.UISpace(height=6))
-        buttons = panel.add(gui.UIBoxLayout(vertical=False, space_between=10))
-        again = buttons.add(gui.UIFlatButton(text="Play again", width=130, height=44, style=PRIMARY))
+        card = gui.UIBoxLayout(space_between=14)
+        card.add(gui.UILabel(f"{PLAYER_NAMES[winner].upper()} WINS", font_name=TITLE_FONT, font_size=26,
+                             text_color=PLAYER_COLORS[winner]))
+        card.add(gui.UILabel("Every other atom has been captured.", font_name=FONT, font_size=12,
+                             text_color=MUTED_TEXT))
+        card.add(gui.UISpace(height=6))
+        buttons = card.add(gui.UIBoxLayout(vertical=False, space_between=10))
+        again = buttons.add(BevelButton("Play again", icon=None, width=140, height=50, variant="primary"))
         again.on_click = lambda event: self.restart()
-        menu = buttons.add(gui.UIFlatButton(text="Menu", width=100, height=44, style=RAISED))
+        menu = buttons.add(BevelButton("Menu", width=110, height=50, variant="raised"))
         menu.on_click = lambda event: self.to_menu()
-        overlay.add(panel)
+        overlay.add(panel(card, padding=32))
         self.add_widget(overlay)
 
     def restart(self):
@@ -185,6 +190,9 @@ class GameView(gui.UIView):
 
     def on_update(self, delta_time):
         self.time += delta_time
+        hovered = next((b.tooltip for b in self.icon_buttons if b.hovered), "")
+        if self.hint.text != hovered:
+            self.hint.text = hovered
         if self.flights:
             self.flight_time += delta_time
             t = min(self.flight_time / FLIGHT_TIME, 1.0)
