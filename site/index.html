@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chain Reaction · Free strategy game for Windows and Linux</title>
+<meta name="description" content="A free 2 to 8 player strategy game. Fill a cell past its limit and it bursts into its neighbours, taking them over. Download for Windows or Linux.">
+<meta property="og:title" content="Chain Reaction">
+<meta property="og:description" content="One atom too many and the board goes off. Free for Windows and Linux.">
+<meta property="og:image" content="img/game.png">
+<link rel="icon" href="img/icon.png">
+<link rel="stylesheet" href="style.css">
+<script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+
+<header class="bar">
+  <a class="wordmark" href="#top">Chain Reaction</a>
+  <nav aria-label="Sections">
+    <a href="#try">Try it</a>
+    <a href="#screens">Screens</a>
+    <a href="#rules">Rules</a>
+    <a class="bar-action" href="#download">Download</a>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>One atom<br>too many</h1>
+      <p class="lede">Chain Reaction is a free strategy game for 2 to 8 players on one computer. Push a cell past its limit and it bursts into its neighbours, taking them over.</p>
+      <div class="actions">
+        <a class="btn btn-accent" href="https://github.com/tanximsiam/Chain-Reaction/releases/latest/download/ChainReaction-windows.exe">Download for Windows</a>
+        <a class="btn" href="https://github.com/tanximsiam/Chain-Reaction/releases/latest/download/ChainReaction-linux.tar.gz">Linux</a>
+      </div>
+      <p class="note">Version 1.0 · about 20 MB · nothing to install</p>
+    </div>
+    <div class="hero-cell" aria-hidden="true">
+      <div class="cluster"><i></i><i></i><i></i></div>
+    </div>
+  </section>
+
+  <section class="try" id="try" data-turn="0">
+    <div class="try-copy reveal">
+      <h2><span id="turn-word">Red</span>’s move</h2>
+      <p>Try it right here: two players, one mouse. Tap a cell to add an atom, then pass to the other side.</p>
+      <p class="try-status" id="try-status" aria-live="polite">Corners burst at two atoms.</p>
+      <button class="btn btn-small" id="try-reset" type="button">Start over</button>
+    </div>
+    <div class="board" id="board" data-ui role="grid" aria-label="Playable 5 by 6 Chain Reaction board"></div>
+  </section>
+
+  <section class="screens" id="screens">
+    <h2 class="reveal">The real thing</h2>
+    <div class="shots">
+      <figure class="shot shot-main reveal">
+        <img src="img/chain.webp" width="462" height="768" alt="Recorded gameplay: Red adds one atom to a corner and a chain of explosions runs across Red's side of the board, capturing Blue's cells">
+        <figcaption>Recorded in the game: one atom in the corner, and the chain runs through Blue’s cells.</figcaption>
+      </figure>
+      <figure class="shot reveal">
+        <img src="img/game.png" width="462" height="768" alt="A four-player game in progress: red, blue, green and yellow atoms across a 9 by 6 board, Green to move" loading="lazy">
+        <figcaption>Up to eight colours on one board.</figcaption>
+      </figure>
+      <figure class="shot reveal">
+        <img src="img/menu.png" width="462" height="768" alt="Start menu with the Chain Reaction title, player count buttons from 2 to 8 and a red Play button" loading="lazy">
+        <figcaption>Pick 2 to 8 players and press Play.</figcaption>
+      </figure>
+      <figure class="shot reveal">
+        <img src="img/pause.png" width="462" height="768" alt="Pause menu over a dimmed board with Resume, Main menu, Exit to desktop, Sound and Music" loading="lazy">
+        <figcaption>Esc pauses: resume, leave, or turn the sound down.</figcaption>
+      </figure>
+      <figure class="shot reveal">
+        <img src="img/manual.png" width="462" height="768" alt="How to play screen with rules and three small animated demo boards" loading="lazy">
+        <figcaption>The manual plays its own demo boards.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="rules" id="rules">
+    <h2 class="reveal">Know the<br>breaking point</h2>
+    <div class="limits reveal" data-ui>
+      <div class="limit limit-corner"><strong>Two atoms</strong><span>Corners have two neighbours, so two atoms set them off.</span></div>
+      <div class="limit limit-edge"><strong>Three atoms</strong><span>Edges hold three before they burst.</span></div>
+      <div class="limit limit-middle"><strong>Four atoms</strong><span>Middle cells take four, one for each side.</span></div>
+    </div>
+    <div class="rules-text">
+      <ul class="atoms reveal">
+        <li>On your turn, add one atom to an empty cell or one of your own.</li>
+        <li>A full cell bursts: one atom flies to each neighbour, and every cell it lands in becomes yours.</li>
+        <li>Neighbours that fill up burst too, so one move can run right across the board.</li>
+        <li>After your first move, losing every atom knocks you out. The last colour standing wins.</li>
+      </ul>
+      <dl class="keys reveal">
+        <dt>Click</dt><dd>Place an atom</dd>
+        <dt>R</dt><dd>Restart the game</dd>
+        <dt>Esc or P</dt><dd>Pause, and resume</dd>
+        <dt>2 to 8, Enter</dt><dd>Choose players and start, on the menu</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="download" id="download">
+    <h2 class="reveal">Free for Windows<br>and Linux</h2>
+    <div class="platforms">
+      <div class="platform reveal">
+        <a class="btn btn-accent btn-big" href="https://github.com/tanximsiam/Chain-Reaction/releases/latest/download/ChainReaction-windows.exe">Windows</a>
+        <p>One file, <code>ChainReaction-windows.exe</code>. Double-click to play. The exe isn’t code-signed yet, so SmartScreen may stop it: choose More info, then Run anyway.</p>
+      </div>
+      <div class="platform reveal">
+        <a class="btn btn-big" href="https://github.com/tanximsiam/Chain-Reaction/releases/latest/download/ChainReaction-linux.tar.gz">Linux</a>
+        <p>Needs OpenGL 3.3. Unpack and run:</p>
+        <pre><code>tar -xzf ChainReaction-linux.tar.gz
+./ChainReaction</code></pre>
+      </div>
+    </div>
+    <p class="note reveal">Every version is on the <a href="https://github.com/tanximsiam/Chain-Reaction/releases">releases page</a>. Prefer Python? <a href="https://github.com/tanximsiam/Chain-Reaction#run">Run it from source</a>.</p>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="mark" aria-hidden="true">
+    <span class="mcell"><i></i></span>
+    <span class="mcell"><i></i><i></i></span>
+    <span class="mcell"><i></i><i></i><i></i></span>
+    <span class="mcell mcell-burst"><i></i><i></i><i></i><i></i></span>
+  </div>
+  <div class="foot-cols">
+    <nav aria-label="Project">
+      <a href="https://github.com/tanximsiam/Chain-Reaction">Source code</a>
+      <a href="https://github.com/tanximsiam/Chain-Reaction/releases">All releases</a>
+      <a href="https://github.com/tanximsiam/Chain-Reaction/issues">Report a bug</a>
+    </nav>
+    <p>Made with <a href="https://api.arcade.academy/">Python Arcade</a>. Sound effects, music and the title font are by <a href="https://kenney.nl/">Kenney</a>, released under CC0.</p>
+  </div>
+  <p class="copy">© 2026 Tanzim Siam</p>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
