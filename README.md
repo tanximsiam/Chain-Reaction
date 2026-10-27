@@ -2,6 +2,13 @@
 
 A 2-8 player Chain Reaction game built with Python and [Arcade](https://api.arcade.academy/) 3.
 
+## Download
+
+Get the latest build from [Releases](https://github.com/tanximsiam/Chain-Reaction/releases/latest), or from the [game page](https://tanximsiam.github.io/Chain-Reaction/).
+
+- **Windows**: download `ChainReaction-windows.exe` and run it. SmartScreen may warn because the exe is unsigned: choose *More info → Run anyway*.
+- **Linux**: download `ChainReaction-linux.tar.gz`, then `tar -xzf ChainReaction-linux.tar.gz && ./ChainReaction`. Needs OpenGL 3.3.
+
 ## Rules
 
 - Players take turns adding an atom to an empty cell or one of their own.
@@ -50,6 +57,15 @@ Open http://localhost:8765 to play the game in a browser. It restarts whenever a
 | `audio.py` | Sound effects, music and their on/off settings |
 | `icons.py` | Stroke icon set rendered once with PIL |
 | `constants.py` | Board size, layout and colours |
+
+## Build
+
+```bash
+venv/bin/pip install pyinstaller
+venv/bin/pyinstaller --noconfirm ChainReaction.spec   # one-file binary in dist/
+```
+
+Pushing a tag like `v1.0.0` runs `.github/workflows/release.yml`, which builds Windows and Linux binaries and attaches them to a GitHub release.
 
 ## Tests
 
