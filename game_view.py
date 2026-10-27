@@ -59,6 +59,10 @@ class GameView(gui.UIView):
                 self.tiles.append(arcade.Sprite(TILE_TEXTURE, scale=1 / SUPERSAMPLE, center_x=x, center_y=y))
         self.atoms = arcade.SpriteList()
         self.flying = arcade.SpriteList()
+        # Built up front: the winner can appear mid-chain, frames before the game-over panel.
+        self.dim = arcade.SpriteList()
+        self.dim.append(arcade.SpriteSolidColor(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+                                                (*BACKGROUND, 200)))
         self.sync()
         self.build_hud()
 
@@ -90,10 +94,6 @@ class GameView(gui.UIView):
 
     def show_game_over(self):
         winner = self.game.winner
-        # The board is dimmed by a sprite: translucent GUI backgrounds blend wrong over sprites.
-        self.dim = arcade.SpriteList()
-        self.dim.append(arcade.SpriteSolidColor(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
-                                                (*BACKGROUND, 200)))
         self.hud.visible = False
         overlay = gui.UIAnchorLayout()
         panel = gui.UIBoxLayout(space_between=14).with_background(color=CELL_COLOR).with_padding(all=32)
