@@ -1,15 +1,19 @@
 """Fonts, colours and shared textures for every screen."""
+from pathlib import Path
+
 import arcade
 from arcade.gui import NinePatchTexture
 from PIL import Image, ImageDraw
 
-for path in ("Kenney/Kenney_Future.ttf", "Liberation/Liberation_Sans_Regular.ttf",
-             "Liberation/Liberation_Sans_Bold.ttf"):
-    arcade.load_font(f":system:fonts/ttf/{path}")
+FONTS = Path(__file__).parent / "assets" / "fonts"  # also valid inside a PyInstaller bundle
+arcade.load_font(":system:fonts/ttf/Kenney/Kenney_Future.ttf")
+for name in ("Rubik-Regular.ttf", "Rubik-Bold.ttf"):
+    arcade.load_font(FONTS / name)
 
 TITLE_FONT = "Kenney Future"
-FONT = "Liberation Sans"
-BOLD_FONT_PATH = arcade.resources.resolve(":system:fonts/ttf/Liberation/Liberation_Sans_Bold.ttf")
+# Sans fallbacks: if Rubik ever fails to register, text must not drop to the system serif.
+FONT = ("Rubik", "Arial", "Liberation Sans", "DejaVu Sans")
+BOLD_FONT_PATH = str(FONTS / "Rubik-Bold.ttf")
 
 TEXT = (241, 245, 249)   # slate 100
 INK = (2, 6, 23)         # slate 950, used to darken
