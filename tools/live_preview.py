@@ -28,7 +28,7 @@ events = queue.Queue()
 status = {"started": time.time(), "error": None, "size": [462, 768]}
 
 KEYS = {"Enter": "ENTER", " ": "SPACE", "Escape": "ESCAPE", "ArrowLeft": "LEFT", "ArrowRight": "RIGHT",
-        "r": "R", "R": "R", **{str(d): f"KEY_{d}" for d in range(10)}}
+        "r": "R", "R": "R", "p": "P", "P": "P", **{str(d): f"KEY_{d}" for d in range(10)}}
 
 
 def sources():
@@ -55,7 +55,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send((Path(__file__).parent / "live_preview.html").read_bytes(), "text/html; charset=utf-8")
         elif self.path == "/status":
             info = {**status, "branch": git("branch", "--show-current"), "commit": git("log", "-1", "--format=%h %s"),
-                    "changes": git("status", "--short").splitlines()}
+                    "changes": git("--no-optional-locks", "status", "--short").splitlines()}
             self.send(json.dumps(info).encode(), "application/json")
         elif self.path.startswith("/stream"):
             self.send_response(200)
@@ -140,7 +140,7 @@ def main():
                 import arcade
                 while not events.empty():
                     dispatch(window, events.get())
-                window.current_view.on_update(now - last)
+                window.dispatch_event("on_update", now - last)  # reaches the view and its GUI widgets
                 window.current_view.on_draw()
                 buffer = io.BytesIO()
                 arcade.get_image().convert("RGB").save(buffer, "JPEG", quality=85)

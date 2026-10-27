@@ -1,8 +1,10 @@
 import arcade
 import arcade.gui as gui
 
-from constants import MUTED_TEXT, PLAYER_COLORS
-from ui_theme import FONT, PRIMARY, SECONDARY, TITLE_FONT, TEXT
+from constants import MARGIN, MUTED_TEXT, PLAYER_COLORS
+from manual_view import ManualView
+from ui_theme import FONT, TITLE_FONT, TEXT
+from widgets import BevelButton, Tooltip, audio_toggle
 
 
 class MenuView(gui.UIView):
@@ -19,13 +21,13 @@ class MenuView(gui.UIView):
         self.count_buttons = {}
         row = gui.UIBoxLayout(vertical=False, space_between=6)
         for n in range(2, len(PLAYER_COLORS) + 1):
-            button = gui.UIFlatButton(text=str(n), width=44, height=44)
+            button = BevelButton(str(n), width=44, height=48)
             button.on_click = lambda event, n=n: self.select(n)
             self.count_buttons[n] = row.add(button)
         column.add(row)
 
         column.add(gui.UISpace(height=20))
-        play = column.add(gui.UIFlatButton(text="Play", width=200, height=48, style=PRIMARY))
+        play = column.add(BevelButton("Play", width=200, height=56, variant="accent", font_size=17, radius=14))
         play.on_click = lambda event: self.start()
         column.add(gui.UISpace(height=28))
         column.add(gui.UILabel(
@@ -34,13 +36,31 @@ class MenuView(gui.UIView):
             "Last player with atoms wins.",
             font_name=FONT, font_size=12, text_color=MUTED_TEXT, multiline=True, width=400, align="center"))
 
-        self.add_widget(gui.UIAnchorLayout()).add(column)
+        root = self.add_widget(gui.UIAnchorLayout())
+        root.add(column)
+        corner = gui.UIBoxLayout(vertical=False, space_between=8)
+        toggles = [corner.add(audio_toggle(kind, width=42, height=42)) for kind in ("sound", "music")]
+        root.add(corner, anchor_x="left", anchor_y="top", align_x=MARGIN, align_y=-MARGIN + 4)
+        self.tooltip = root.add(Tooltip(toggles), anchor_x="left", anchor_y="top", align_x=MARGIN, align_y=-72)
+
+        corner = gui.UIBoxLayout(vertical=False, space_between=8)
+        actions = [corner.add(BevelButton(icon="help", width=42, height=42, tooltip="How to play")),
+                   corner.add(BevelButton(icon="exit", width=42, height=42, tooltip="Quit"))]
+        actions[0].on_click = lambda event: self.window.show_view(ManualView(self))
+        actions[1].on_click = lambda event: arcade.exit()
+        root.add(corner, anchor_x="right", anchor_y="top", align_x=-MARGIN, align_y=-MARGIN + 4)
+        self.action_tooltip = root.add(Tooltip(actions), anchor_x="right", anchor_y="top",
+                                       align_x=-MARGIN, align_y=-72)
         self.select(players)
+
+    def on_update(self, delta_time):
+        self.tooltip.refresh()
+        self.action_tooltip.refresh()
 
     def select(self, n):
         self.players = n
         for count, button in self.count_buttons.items():
-            button.style = PRIMARY if count == n else SECONDARY
+            button.variant = "accent" if count == n else "secondary"
 
     def start(self):
         from game_view import GameView  # avoid circular import: GameView links back here

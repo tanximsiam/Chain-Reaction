@@ -34,16 +34,21 @@ Open http://localhost:8765 to play the game in a browser. It restarts whenever a
 | Menu | Enter or Space | Start |
 | Game | Click a cell | Place an atom |
 | Game | R | Restart |
-| Game | Esc | Back to menu |
+| Game | Esc or P | Pause / resume (pause menu: Resume, Main menu, Exit to desktop, Sound, Music) |
 
 ## Code layout
 
 | File | Responsibility |
 |---|---|
 | `board.py` | Game rules only: board, explosion waves, turns, elimination |
-| `game_view.py` | Sprite board, explosion animation, HUD and game-over panel |
-| `menu_view.py` | Start menu |
-| `ui_theme.py` | Fonts and `arcade.gui` button styles |
+| `board_sprites.py` | `BoardSprites`: tiles, atoms and explosion animation for any Board, at any size |
+| `game_view.py` | Game flow, HUD and game-over panel |
+| `menu_view.py` | Start menu (players, Play, sound/music, How to play, Quit) |
+| `manual_view.py` | How to play, with looping demo boards (critical mass, capture, chain) |
+| `ui_theme.py` | Fonts, colours and rounded nine-patch textures |
+| `widgets.py` | `BevelButton` (animated bevelled button) and rounded panels |
+| `audio.py` | Sound effects, music and their on/off settings |
+| `icons.py` | Stroke icon set rendered once with PIL |
 | `constants.py` | Board size, layout and colours |
 
 ## Tests

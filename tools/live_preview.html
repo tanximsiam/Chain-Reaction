@@ -81,7 +81,7 @@
         <kbd>2–8</kbd><span>Player count (menu)</span>
         <kbd>Enter</kbd><span>Start</span>
         <kbd>R</kbd><span>Restart</span>
-        <kbd>Esc</kbd><span>Menu</span>
+        <kbd>Esc / P</kbd><span>Pause</span>
       </div>
     </section>
   </aside>
@@ -105,7 +105,7 @@
     send({ type: "move", ...toGame(e) });
   });
   document.addEventListener("keydown", (e) => {
-    if (!/^(Enter| |Escape|ArrowLeft|ArrowRight|[0-9rR])$/.test(e.key) || e.target !== game && e.target !== document.body) return;
+    if (!/^(Enter| |Escape|ArrowLeft|ArrowRight|[0-9rRpP])$/.test(e.key) || e.target !== game && e.target !== document.body) return;
     e.preventDefault();
     send({ type: "key", key: e.key });
   });
