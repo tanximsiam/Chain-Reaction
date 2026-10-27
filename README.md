@@ -41,7 +41,8 @@ Open http://localhost:8765 to play the game in a browser. It restarts whenever a
 | File | Responsibility |
 |---|---|
 | `board.py` | Game rules only: board, explosion waves, turns, elimination |
-| `game_view.py` | Sprite board, explosion animation, HUD and game-over panel |
+| `board_sprites.py` | `BoardSprites`: tiles, atoms and explosion animation for any Board, at any size |
+| `game_view.py` | Game flow, HUD and game-over panel |
 | `menu_view.py` | Start menu |
 | `ui_theme.py` | Fonts, colours and rounded nine-patch textures |
 | `widgets.py` | `BevelButton` (animated bevelled button) and rounded panels |
