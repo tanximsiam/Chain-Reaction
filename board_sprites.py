@@ -25,8 +25,10 @@ ATOM_TEXTURE = shape_texture("atom", ATOM_RADIUS * 2, lambda d, s: d.ellipse((0,
 
 
 class BoardSprites:
-    def __init__(self, board, left, bottom, cell_size=CELL_SIZE, gap=CELL_GAP, tile_color=CELL_COLOR):
+    def __init__(self, board, left, bottom, cell_size=CELL_SIZE, gap=CELL_GAP, tile_color=CELL_COLOR,
+                 flight_duration=FLIGHT_TIME):
         self.board = board
+        self.flight_duration = flight_duration
         self.cell_size = cell_size
         self.gap = gap
         self.tile_color = tile_color
@@ -133,7 +135,7 @@ class BoardSprites:
         landed = False
         if self.flights:
             self.flight_time += dt
-            t = min(self.flight_time / FLIGHT_TIME, 1.0)
+            t = min(self.flight_time / self.flight_duration, 1.0)
             ease = 1 - (1 - t) ** 3
             for sprite, (src, dst, _) in zip(self.flying, self.flights):
                 (x0, y0), (x1, y1) = self.cell_center(*src), self.cell_center(*dst)
