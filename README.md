@@ -18,6 +18,14 @@ venv/bin/pip install -r requirements.txt   # Windows: venv\Scripts\pip
 venv/bin/python main.py
 ```
 
+### Live preview (development)
+
+```bash
+venv/bin/python tools/live_preview.py
+```
+
+Open http://localhost:8765 to play the game in a browser. It restarts whenever a `.py` file changes and shows the current branch and uncommitted files.
+
 ## Controls
 
 | Where | Input | Action |
