@@ -8,7 +8,8 @@ from board import Game
 from constants import *
 from menu_view import MenuView
 from ui_theme import FONT, TITLE_FONT
-from widgets import BevelButton, panel
+from widgets import BevelButton, Tooltip, audio_toggle, panel
+import audio
 
 ELIMINATED = (71, 85, 105)  # slate 600
 
@@ -52,6 +53,7 @@ class GameView(gui.UIView):
         self.resolving = False
         self.flights = []
         self.flight_time = 0.0
+        self.wave = 0
 
         self.tiles = arcade.SpriteList()
         for r in range(ROWS):
@@ -76,16 +78,17 @@ class GameView(gui.UIView):
                        for p in range(self.players)]
         root.add(info, anchor_x="left", anchor_y="top", align_x=MARGIN, align_y=-MARGIN)
 
-        side = gui.UIBoxLayout(space_between=6, align="right")
-        actions = side.add(gui.UIBoxLayout(vertical=False, space_between=8))
-        self.icon_buttons = []
+        actions = gui.UIBoxLayout(vertical=False, space_between=8)
+        buttons = [audio_toggle("sound", width=42, height=42), audio_toggle("music", width=42, height=42)]
         for icon, tooltip, action in (("restart", "Restart  R", self.restart), ("menu", "Menu  Esc", self.to_menu)):
-            button = actions.add(BevelButton(icon=icon, width=42, height=42, tooltip=tooltip))
+            button = BevelButton(icon=icon, width=42, height=42, tooltip=tooltip)
             button.on_click = lambda event, action=action: action()
-            self.icon_buttons.append(button)
-        self.hint = side.add(gui.UILabel("", font_name=FONT, font_size=11, text_color=MUTED_TEXT,
-                                         width=150, align="right"))
-        root.add(side, anchor_x="right", anchor_y="top", align_x=-MARGIN, align_y=-MARGIN + 4)
+            buttons.append(button)
+        for button in buttons:
+            actions.add(button)
+        root.add(actions, anchor_x="right", anchor_y="top", align_x=-MARGIN, align_y=-MARGIN + 4)
+        # Floats under the buttons, over the roster, only while a button is hovered.
+        self.tooltip = root.add(Tooltip(buttons), anchor_x="right", anchor_y="top", align_x=-MARGIN, align_y=-72)
         self.update_hud()
 
     def update_hud(self):
@@ -184,15 +187,19 @@ class GameView(gui.UIView):
 
     def on_mouse_press(self, x, y, button, modifiers):
         cell = self.cell_at(x, y)
-        if cell and not self.busy and self.game.play(*cell):
+        if not cell or self.busy:
+            return
+        if self.game.play(*cell):
+            audio.play("place")
             self.resolving = True
+            self.wave = 0
             self.sync()
+        else:
+            audio.play("error")
 
     def on_update(self, delta_time):
         self.time += delta_time
-        hovered = next((b.tooltip for b in self.icon_buttons if b.hovered), "")
-        if self.hint.text != hovered:
-            self.hint.text = hovered
+        self.tooltip.refresh()
         if self.flights:
             self.flight_time += delta_time
             t = min(self.flight_time / FLIGHT_TIME, 1.0)
@@ -210,6 +217,8 @@ class GameView(gui.UIView):
             if self.game.winner is None and self.game.board.unstable():
                 self.flights = self.game.board.start_wave()
                 self.flight_time = 0.0
+                self.wave += 1
+                audio.play("explode", speed=min(1 + 0.07 * (self.wave - 1), 1.8))  # pitch climbs with the chain
                 for src, _, player in self.flights:
                     self.flying.append(atom_sprite(player))
                 self.sync()
@@ -223,6 +232,7 @@ class GameView(gui.UIView):
     def on_turn_end(self):
         self.update_hud()
         if self.game.winner is not None:
+            audio.play("win")
             self.show_game_over()
 
     def on_draw_before_ui(self):

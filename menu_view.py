@@ -1,9 +1,9 @@
 import arcade
 import arcade.gui as gui
 
-from constants import MUTED_TEXT, PLAYER_COLORS
+from constants import MARGIN, MUTED_TEXT, PLAYER_COLORS
 from ui_theme import FONT, TITLE_FONT, TEXT
-from widgets import BevelButton
+from widgets import BevelButton, Tooltip, audio_toggle
 
 
 class MenuView(gui.UIView):
@@ -35,8 +35,16 @@ class MenuView(gui.UIView):
             "Last player with atoms wins.",
             font_name=FONT, font_size=12, text_color=MUTED_TEXT, multiline=True, width=400, align="center"))
 
-        self.add_widget(gui.UIAnchorLayout()).add(column)
+        root = self.add_widget(gui.UIAnchorLayout())
+        root.add(column)
+        corner = gui.UIBoxLayout(vertical=False, space_between=8)
+        toggles = [corner.add(audio_toggle(kind, width=42, height=42)) for kind in ("sound", "music")]
+        root.add(corner, anchor_x="left", anchor_y="top", align_x=MARGIN, align_y=-MARGIN + 4)
+        self.tooltip = root.add(Tooltip(toggles), anchor_x="left", anchor_y="top", align_x=MARGIN, align_y=-72)
         self.select(players)
+
+    def on_update(self, delta_time):
+        self.tooltip.refresh()
 
     def select(self, n):
         self.players = n

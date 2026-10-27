@@ -2,6 +2,7 @@ import arcade
 import arcade.gui as gui
 from arcade.gui.property import bind
 
+import audio
 from icons import icon_texture
 from ui_theme import FONT, INK, VARIANTS, WHITE, lerp, rounded_patch
 
@@ -45,6 +46,7 @@ class BevelButton(gui.UIInteractiveWidget):
     def _on_pressed(self):
         if self.pressed:
             self.velocity = PRESS_KICK
+            audio.play("click")
         self.trigger_render()
 
     def on_update(self, dt):
@@ -81,3 +83,35 @@ class BevelButton(gui.UIInteractiveWidget):
 def panel(child, padding=28, radius=20, color=(30, 41, 59)):
     """Rounded card holding `child`."""
     return child.with_background(texture=rounded_patch(color, radius)).with_padding(all=padding)
+
+
+def audio_toggle(kind, **kwargs):
+    """Icon button that turns "sound" or "music" on and off."""
+    def tooltip():
+        return f"{kind.capitalize()} {'on' if audio.settings[kind] else 'off'}"
+
+    button = BevelButton(icon=audio.icon(kind), tooltip=tooltip(), **kwargs)
+
+    def click(event):
+        audio.toggle(kind)
+        button.set_icon(audio.icon(kind))
+        button.tooltip = tooltip()
+    button.on_click = click
+    return button
+
+
+class Tooltip(gui.UILabel):
+    """Small pill that names whichever of `buttons` is hovered. Call refresh() every frame."""
+
+    def __init__(self, buttons):
+        super().__init__("", font_name=FONT, font_size=11, text_color=(226, 232, 240))
+        self.buttons = buttons
+        self.with_background(texture=rounded_patch((51, 65, 85), 8)).with_padding(left=8, right=8, top=4, bottom=4)
+        self.visible = False
+
+    def refresh(self):
+        text = next((b.tooltip for b in self.buttons if b.hovered), "")
+        if text != self.text:
+            self.text = text
+            self.fit_content()
+            self.visible = bool(text)
