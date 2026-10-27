@@ -56,6 +56,7 @@ class BoardSprites:
         self.left, self.bottom = left, bottom
         for i, tile in enumerate(self.tiles):
             tile.position = self.cell_center(*divmod(i, self.board.cols))
+        self.place_atoms()  # atoms follow now, not on the next update
 
     # Row 0 is the top row.
     def cell_center(self, row, col):
