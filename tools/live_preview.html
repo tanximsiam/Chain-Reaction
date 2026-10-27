@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chain Reaction · Live</title>
+<style>
+  :root {
+    --canvas: #f1f2f5; --card: #fff; --text: #0f172a; --muted: #64748b; --line: #e2e8f0;
+    --live: #16a34a; --busy: #d97706; --error: #dc2626; --error-bg: #fef2f2;
+    --shadow: 0 1px 2px rgb(15 23 42 / .04), 0 4px 16px rgb(15 23 42 / .04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --canvas: #0b1120; --card: #172033; --text: #f1f5f9; --muted: #94a3b8; --line: #263247;
+      --live: #4ade80; --busy: #fbbf24; --error: #f87171; --error-bg: #2a1215; --shadow: none;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--canvas); color: var(--text);
+         font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Ubuntu, sans-serif; }
+  header { display: flex; align-items: center; gap: 12px; padding: 16px 24px; }
+  h1 { font-size: 16px; margin: 0; font-weight: 650; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px;
+          background: var(--card); box-shadow: var(--shadow); font-size: 12px; color: var(--muted); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--busy); }
+  .live .dot { background: var(--live); }
+  .error .dot { background: var(--error); }
+  main { display: grid; grid-template-columns: auto 320px; gap: 24px; justify-content: center;
+         align-items: start; padding: 0 24px 24px; }
+  .stage { position: relative; }
+  #game { display: block; height: calc(100vh - 96px); max-height: 768px; min-height: 360px; width: auto;
+          aspect-ratio: 462 / 768; border-radius: 16px; box-shadow: var(--shadow); cursor: pointer;
+          background: #0f172a; user-select: none; }
+  #game:focus-visible { outline: 3px solid var(--live); outline-offset: 3px; }
+  .card { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 20px; }
+  .card + .card { margin-top: 16px; }
+  .label { font-size: 12px; color: var(--muted); margin: 0 0 6px; }
+  .value { font-weight: 600; word-break: break-word; }
+  ul { list-style: none; margin: 0; padding: 0; font: 12px/1.9 ui-monospace, "Ubuntu Mono", monospace; }
+  li span { display: inline-block; width: 22px; color: var(--muted); }
+  .empty { color: var(--muted); font-size: 13px; }
+  kbd { font: 12px ui-monospace, monospace; padding: 1px 6px; border-radius: 6px; background: var(--canvas); }
+  .keys { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 13px; color: var(--muted); }
+  #error { display: none; position: absolute; inset: 12px; overflow: auto; margin: 0; padding: 16px;
+           border-radius: 12px; background: var(--error-bg); color: var(--error);
+           font: 12px/1.5 ui-monospace, monospace; white-space: pre-wrap; }
+  .error #error { display: block; }
+  @media (max-width: 760px) {
+    header { padding: 16px; }
+    main { grid-template-columns: 1fr; padding: 0 16px 16px; }
+    #game { width: 100%; height: auto; min-height: 0; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Chain Reaction</h1>
+  <span class="pill" id="state" role="status"><span class="dot"></span><span id="state-text">Connecting…</span></span>
+</header>
+<main>
+  <div class="stage" id="stage">
+    <img id="game" src="/stream" alt="Live game view. Click to play." tabindex="0">
+    <pre id="error"></pre>
+  </div>
+  <aside>
+    <section class="card">
+      <p class="label">Branch</p>
+      <p class="value" id="branch">–</p>
+      <p class="label" style="margin-top:14px">Last commit</p>
+      <p class="value" id="commit">–</p>
+    </section>
+    <section class="card">
+      <p class="label">Being worked on (uncommitted)</p>
+      <ul id="changes"></ul>
+    </section>
+    <section class="card">
+      <p class="label">Controls</p>
+      <div class="keys">
+        <kbd>Click</kbd><span>Place atom / press button</span>
+        <kbd>2–8</kbd><span>Player count (menu)</span>
+        <kbd>Enter</kbd><span>Start</span>
+        <kbd>R</kbd><span>Restart</span>
+        <kbd>Esc</kbd><span>Menu</span>
+      </div>
+    </section>
+  </aside>
+</main>
+<script>
+  const game = document.getElementById("game");
+  const state = document.getElementById("state");
+  const stateText = document.getElementById("state-text");
+  let started = null, size = [462, 768], lastMove = 0;
+
+  const send = (event) => fetch("/input", { method: "POST", body: JSON.stringify(event) }).catch(() => {});
+
+  function toGame(e) {
+    const r = game.getBoundingClientRect();
+    return { x: (e.clientX - r.left) / r.width * size[0], y: size[1] - (e.clientY - r.top) / r.height * size[1] };
+  }
+  game.addEventListener("click", (e) => { game.focus(); send({ type: "click", ...toGame(e) }); });
+  game.addEventListener("mousemove", (e) => {
+    if (performance.now() - lastMove < 40) return;
+    lastMove = performance.now();
+    send({ type: "move", ...toGame(e) });
+  });
+  document.addEventListener("keydown", (e) => {
+    if (!/^(Enter| |Escape|ArrowLeft|ArrowRight|[0-9rR])$/.test(e.key) || e.target !== game && e.target !== document.body) return;
+    e.preventDefault();
+    send({ type: "key", key: e.key });
+  });
+  game.addEventListener("error", () => setTimeout(() => { game.src = "/stream?" + Date.now(); }, 1000));
+
+  function setState(cls, text) { state.className = "pill " + cls; stateText.textContent = text; }
+
+  async function poll() {
+    try {
+      const s = await (await fetch("/status", { cache: "no-store" })).json();
+      size = s.size;
+      if (s.started !== started) { started = s.started; game.src = "/stream?" + started; }
+      document.getElementById("stage").className = "stage " + (s.error ? "error" : "");
+      document.getElementById("error").textContent = s.error || "";
+      document.getElementById("branch").textContent = s.branch || "(detached)";
+      document.getElementById("commit").textContent = s.commit;
+      const list = document.getElementById("changes");
+      list.replaceChildren(...(s.changes.length ? s.changes.map((line) => {
+        const li = document.createElement("li"), tag = document.createElement("span");
+        tag.textContent = line.slice(0, 2).trim();
+        li.append(tag, line.slice(3));
+        return li;
+      }) : [Object.assign(document.createElement("li"), { className: "empty", textContent: "Nothing uncommitted" })]));
+      setState(s.error ? "error" : "live",
+               s.error ? "Error, fix the code to reload" : "Live · reloaded " + new Date(s.started * 1000).toLocaleTimeString());
+    } catch {
+      setState("", "Reloading…");
+    }
+  }
+  poll();
+  setInterval(poll, 1000);
+</script>
+</body>
+</html>
