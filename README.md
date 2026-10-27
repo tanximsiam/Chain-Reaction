@@ -97,3 +97,8 @@ Work happens on feature branches merged into `dev` through pull requests; `dev` 
 - Built with [Python Arcade](https://api.arcade.academy/) (MIT).
 - Sound effects, music and the Kenney Future font by [Kenney](https://kenney.nl/) (CC0), bundled with Arcade.
 - Text set in [Rubik](https://github.com/googlefonts/rubik) (SIL Open Font License, see `assets/fonts/OFL.txt`).
+
+## License
+
+The game code is released under the [MIT License](LICENSE), © 2026 Tanzim Siam.
+The bundled fonts and sounds keep their own licences, listed under Credits: Kenney assets are CC0 and Rubik is under the SIL Open Font License (`assets/fonts/OFL.txt`).
