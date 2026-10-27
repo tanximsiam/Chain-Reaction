@@ -30,7 +30,8 @@ DEMOS = [
     ("Chain", [(0, 0, RED, 1), (0, 1, RED, 2), (0, 2, BLUE, 1), (1, 1, BLUE, 3), (1, 2, BLUE, 2), (2, 1, BLUE, 1)],
      [(0, 0, RED)]),
 ]
-CUE_TIME, END_TIME, MAX_WAVES = 0.8, 1.6, 12
+# Teaching pace, slower than play: each atom's flight and each step can be followed by eye.
+DEMO_FLIGHT, CUE_TIME, WAVE_GAP, END_TIME, MAX_WAVES = 0.6, 1.4, 0.45, 2.6, 12
 
 
 class Demo:
@@ -48,7 +49,8 @@ class Demo:
                 board.place(r, c, player)
         left, bottom = (self.sprites.left, self.sprites.bottom) if self.sprites else (0, 0)
         self.sprites = BoardSprites(board, left, bottom, cell_size=DEMO_CELL, gap=DEMO_GAP,
-                                    tile_color=BACKGROUND)  # darker wells: panel is CELL_COLOR
+                                    tile_color=BACKGROUND,  # darker wells: panel is CELL_COLOR
+                                    flight_duration=DEMO_FLIGHT)
         self.step, self.timer, self.waves = 0, 0.0, 0
 
     def update(self, dt):
@@ -56,11 +58,12 @@ class Demo:
         sprites.update(dt)
         if sprites.animating:
             return
-        if sprites.board.unstable() and self.waves < MAX_WAVES:
-            sprites.start_wave()
-            self.waves += 1
-            return
         self.timer += dt
+        if sprites.board.unstable() and self.waves < MAX_WAVES:
+            if self.timer > WAVE_GAP:  # let the full cell be seen before it bursts
+                sprites.start_wave()
+                self.waves, self.timer = self.waves + 1, 0.0
+            return
         if self.step < len(self.moves):
             r, c, player = self.moves[self.step]
             sprites.set_highlight((r, c), player)  # cue the cell, like a hover, before "clicking" it

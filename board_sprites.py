@@ -25,8 +25,10 @@ ATOM_TEXTURE = shape_texture("atom", ATOM_RADIUS * 2, lambda d, s: d.ellipse((0,
 
 
 class BoardSprites:
-    def __init__(self, board, left, bottom, cell_size=CELL_SIZE, gap=CELL_GAP, tile_color=CELL_COLOR):
+    def __init__(self, board, left, bottom, cell_size=CELL_SIZE, gap=CELL_GAP, tile_color=CELL_COLOR,
+                 flight_duration=FLIGHT_TIME):
         self.board = board
+        self.flight_duration = flight_duration
         self.cell_size = cell_size
         self.gap = gap
         self.tile_color = tile_color
@@ -56,6 +58,7 @@ class BoardSprites:
         self.left, self.bottom = left, bottom
         for i, tile in enumerate(self.tiles):
             tile.position = self.cell_center(*divmod(i, self.board.cols))
+        self.place_atoms()  # atoms follow now, not on the next update
 
     # Row 0 is the top row.
     def cell_center(self, row, col):
@@ -120,8 +123,10 @@ class BoardSprites:
         """Pop every unstable cell and start flying its atoms to the neighbours."""
         self.flights = self.board.start_wave()
         self.flight_time = 0.0
-        for _, _, player in self.flights:
-            self.flying.append(self.atom_sprite(player))
+        for src, _, player in self.flights:
+            sprite = self.atom_sprite(player)
+            sprite.position = self.cell_center(*src)  # else it is drawn at (0, 0) until the next update
+            self.flying.append(sprite)
         self.sync()
 
     def update(self, dt):
@@ -130,7 +135,7 @@ class BoardSprites:
         landed = False
         if self.flights:
             self.flight_time += dt
-            t = min(self.flight_time / FLIGHT_TIME, 1.0)
+            t = min(self.flight_time / self.flight_duration, 1.0)
             ease = 1 - (1 - t) ** 3
             for sprite, (src, dst, _) in zip(self.flying, self.flights):
                 (x0, y0), (x1, y1) = self.cell_center(*src), self.cell_center(*dst)
