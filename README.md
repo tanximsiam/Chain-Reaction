@@ -24,7 +24,7 @@ venv/bin/python main.py
 venv/bin/python tools/live_preview.py
 ```
 
-Open http://localhost:8765 to play the game in a browser. It restarts whenever a `.py` file changes and shows the current branch and uncommitted files.
+Open http://localhost:8765 to play the game in a browser. It restarts whenever a `.py` file changes.
 
 ## Controls
 

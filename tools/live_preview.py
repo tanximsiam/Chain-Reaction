@@ -9,7 +9,6 @@ import io
 import json
 import os
 import queue
-import subprocess
 import sys
 import threading
 import time
@@ -35,10 +34,6 @@ def sources():
     return {p: p.stat().st_mtime for p in ROOT.glob("**/*.py") if "venv" not in p.parts}
 
 
-def git(*args):
-    return subprocess.run(["git", *args], capture_output=True, text=True, cwd=ROOT).stdout.rstrip()
-
-
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *args):
         pass
@@ -54,9 +49,7 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == "/":
             self.send((Path(__file__).parent / "live_preview.html").read_bytes(), "text/html; charset=utf-8")
         elif self.path == "/status":
-            info = {**status, "branch": git("branch", "--show-current"), "commit": git("log", "-1", "--format=%h %s"),
-                    "changes": git("--no-optional-locks", "status", "--short").splitlines()}
-            self.send(json.dumps(info).encode(), "application/json")
+            self.send(json.dumps(status).encode(), "application/json")
         elif self.path.startswith("/stream"):
             self.send_response(200)
             self.send_header("Content-Type", "multipart/x-mixed-replace; boundary=frame")
