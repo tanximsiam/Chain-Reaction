@@ -132,6 +132,8 @@ def main():
             checked = now
             if sources() != mtimes:
                 print("Change detected, restarting", flush=True)
+                while not Path(__file__).exists():  # e.g. mid branch switch
+                    time.sleep(0.5)
                 os.execv(sys.executable, [sys.executable, *sys.argv])  # server socket is closed on exec
         if window:
             try:
