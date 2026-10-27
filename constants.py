@@ -6,7 +6,7 @@ CELL_SIZE = 64
 CELL_GAP = 6
 CELL_RADIUS = 12
 ATOM_RADIUS = 10
-ATOM_SPREAD = 11 # distance of each atom from the cell centre when a cell holds 2+
+ATOM_SPREAD = 11  # distance of each atom from the cell centre when a cell holds 2+
 MARGIN = 24
 HUD_HEIGHT = 96
 

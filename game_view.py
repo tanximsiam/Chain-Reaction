@@ -1,11 +1,15 @@
 import math
 
 import arcade
-import arcade.gui
+import arcade.gui as gui
 from PIL import Image, ImageDraw
 
 from board import Game
 from constants import *
+from menu_view import MenuView
+from ui_theme import FONT, PRIMARY, RAISED, SMALL, TITLE_FONT
+
+ELIMINATED = (71, 85, 105)  # slate 600
 
 
 SUPERSAMPLE = 4
@@ -37,7 +41,7 @@ def atom_offsets(count, angle):
              ATOM_SPREAD * math.sin(angle + i * 2 * math.pi / count)) for i in range(count)]
 
 
-class GameView(arcade.gui.UIView):
+class GameView(gui.UIView):
     def __init__(self, players):
         super().__init__()
         self.players = players
@@ -56,6 +60,67 @@ class GameView(arcade.gui.UIView):
         self.atoms = arcade.SpriteList()
         self.flying = arcade.SpriteList()
         self.sync()
+        self.build_hud()
+
+    def build_hud(self):
+        root = self.hud = self.add_widget(gui.UIAnchorLayout())
+        info = gui.UIBoxLayout(space_between=8, align="left")
+        self.turn_label = info.add(gui.UILabel("", font_name=FONT, font_size=20, bold=True))
+        roster = info.add(gui.UIBoxLayout(vertical=False, space_between=12))
+        self.roster = [roster.add(gui.UILabel(PLAYER_NAMES[p], font_name=FONT, font_size=12))
+                       for p in range(self.players)]
+        root.add(info, anchor_x="left", anchor_y="top", align_x=MARGIN, align_y=-MARGIN)
+
+        actions = gui.UIBoxLayout(vertical=False, space_between=8)
+        restart = actions.add(gui.UIFlatButton(text="Restart", width=76, height=32, style=SMALL))
+        restart.on_click = lambda event: self.restart()
+        menu = actions.add(gui.UIFlatButton(text="Menu", width=64, height=32, style=SMALL))
+        menu.on_click = lambda event: self.to_menu()
+        root.add(actions, anchor_x="right", anchor_y="top", align_x=-MARGIN, align_y=-MARGIN)
+        self.update_hud()
+
+    def update_hud(self):
+        game = self.game
+        player = game.turn if game.winner is None else game.winner
+        self.turn_label.text = f"{PLAYER_NAMES[player]}'s turn" if game.winner is None else f"{PLAYER_NAMES[player]} wins"
+        self.turn_label.update_font(font_color=PLAYER_COLORS[player])
+        self.turn_label.fit_content()
+        for p, label in enumerate(self.roster):
+            label.update_font(font_color=PLAYER_COLORS[p] if p in game.alive else ELIMINATED)
+
+    def show_game_over(self):
+        winner = self.game.winner
+        # The board is dimmed by a sprite: translucent GUI backgrounds blend wrong over sprites.
+        self.dim = arcade.SpriteList()
+        self.dim.append(arcade.SpriteSolidColor(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+                                                (*BACKGROUND, 200)))
+        self.hud.visible = False
+        overlay = gui.UIAnchorLayout()
+        panel = gui.UIBoxLayout(space_between=14).with_background(color=CELL_COLOR).with_padding(all=32)
+        panel.add(gui.UILabel(f"{PLAYER_NAMES[winner].upper()} WINS", font_name=TITLE_FONT, font_size=26,
+                              text_color=PLAYER_COLORS[winner]))
+        panel.add(gui.UILabel("Every other atom has been captured.", font_name=FONT, font_size=12,
+                              text_color=MUTED_TEXT))
+        panel.add(gui.UISpace(height=6))
+        buttons = panel.add(gui.UIBoxLayout(vertical=False, space_between=10))
+        again = buttons.add(gui.UIFlatButton(text="Play again", width=130, height=44, style=PRIMARY))
+        again.on_click = lambda event: self.restart()
+        menu = buttons.add(gui.UIFlatButton(text="Menu", width=100, height=44, style=RAISED))
+        menu.on_click = lambda event: self.to_menu()
+        overlay.add(panel)
+        self.add_widget(overlay)
+
+    def restart(self):
+        self.window.show_view(GameView(self.players))
+
+    def to_menu(self):
+        self.window.show_view(MenuView(self.players))
+
+    def on_key_press(self, symbol, modifiers):
+        if symbol == arcade.key.R:
+            self.restart()
+        elif symbol == arcade.key.ESCAPE:
+            self.to_menu()
 
     # Layout: row 0 is the top row of the board.
     def cell_center(self, row, col):
@@ -147,9 +212,13 @@ class GameView(arcade.gui.UIView):
         self.place_atoms()
 
     def on_turn_end(self):
-        """Hook for the HUD."""
+        self.update_hud()
+        if self.game.winner is not None:
+            self.show_game_over()
 
     def on_draw_before_ui(self):
         self.tiles.draw()
         self.atoms.draw()
         self.flying.draw()
+        if self.game.winner is not None:
+            self.dim.draw()
