@@ -1,6 +1,4 @@
-<p align="center"><img src="assets/icon.png" width="96" alt=""></p>
-
-<h1 align="center">Chain Reaction</h1>
+<a href="https://tanximsiam.github.io/Chain-Reaction/"><img src="site/img/banner.png" alt="Chain Reaction: a free strategy game for 2 to 8 players, for Windows and Linux"></a>
 
 <p align="center">
 A free strategy game for 2 to 8 players on one computer.<br>
