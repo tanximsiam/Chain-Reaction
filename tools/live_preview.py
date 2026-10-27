@@ -140,7 +140,7 @@ def main():
                 import arcade
                 while not events.empty():
                     dispatch(window, events.get())
-                window.current_view.on_update(now - last)
+                window.dispatch_event("on_update", now - last)  # reaches the view and its GUI widgets
                 window.current_view.on_draw()
                 buffer = io.BytesIO()
                 arcade.get_image().convert("RGB").save(buffer, "JPEG", quality=85)
