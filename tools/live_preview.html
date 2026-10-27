@@ -37,9 +37,6 @@
   .card + .card { margin-top: 16px; }
   .label { font-size: 12px; color: var(--muted); margin: 0 0 6px; }
   .value { font-weight: 600; word-break: break-word; }
-  ul { list-style: none; margin: 0; padding: 0; font: 12px/1.9 ui-monospace, "Ubuntu Mono", monospace; }
-  li span { display: inline-block; width: 22px; color: var(--muted); }
-  .empty { color: var(--muted); font-size: 13px; }
   kbd { font: 12px ui-monospace, monospace; padding: 1px 6px; border-radius: 6px; background: var(--canvas); }
   .keys { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 13px; color: var(--muted); }
   #error { display: none; position: absolute; inset: 12px; overflow: auto; margin: 0; padding: 16px;
@@ -64,16 +61,6 @@
     <pre id="error"></pre>
   </div>
   <aside>
-    <section class="card">
-      <p class="label">Branch</p>
-      <p class="value" id="branch">–</p>
-      <p class="label" style="margin-top:14px">Last commit</p>
-      <p class="value" id="commit">–</p>
-    </section>
-    <section class="card">
-      <p class="label">Being worked on (uncommitted)</p>
-      <ul id="changes"></ul>
-    </section>
     <section class="card">
       <p class="label">Controls</p>
       <div class="keys">
@@ -120,15 +107,6 @@
       if (s.started !== started) { started = s.started; game.src = "/stream?" + started; }
       document.getElementById("stage").className = "stage " + (s.error ? "error" : "");
       document.getElementById("error").textContent = s.error || "";
-      document.getElementById("branch").textContent = s.branch || "(detached)";
-      document.getElementById("commit").textContent = s.commit;
-      const list = document.getElementById("changes");
-      list.replaceChildren(...(s.changes.length ? s.changes.map((line) => {
-        const li = document.createElement("li"), tag = document.createElement("span");
-        tag.textContent = line.slice(0, 2).trim();
-        li.append(tag, line.slice(3));
-        return li;
-      }) : [Object.assign(document.createElement("li"), { className: "empty", textContent: "Nothing uncommitted" })]));
       setState(s.error ? "error" : "live",
                s.error ? "Error, fix the code to reload" : "Live · reloaded " + new Date(s.started * 1000).toLocaleTimeString());
     } catch {
