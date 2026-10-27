@@ -1,74 +1,99 @@
-# Chain Reaction
+<p align="center"><img src="assets/icon.png" width="96" alt=""></p>
 
-A 2-8 player Chain Reaction game built with Python and [Arcade](https://api.arcade.academy/) 3.
+<h1 align="center">Chain Reaction</h1>
+
+<p align="center">
+A free strategy game for 2 to 8 players on one computer.<br>
+Push a cell past its limit and it bursts into its neighbours, taking them over.
+</p>
+
+<p align="center">
+<a href="https://tanximsiam.github.io/Chain-Reaction/"><b>Game page</b></a> ·
+<a href="https://github.com/tanximsiam/Chain-Reaction/releases/latest"><b>Download</b></a> ·
+<a href="#how-to-play">How to play</a> ·
+<a href="#run-from-source">Run from source</a>
+</p>
+
+<p align="center">
+<img src="site/img/chain.webp" width="260" alt="Recorded gameplay: one atom in a corner sets off a chain across the board">
+<img src="site/img/menu.png" width="260" alt="Start menu with player count and Play button">
+<img src="site/img/pause.png" width="260" alt="Pause menu with Resume, Main menu, Exit to desktop, Sound and Music">
+</p>
 
 ## Download
 
-Get the latest build from [Releases](https://github.com/tanximsiam/Chain-Reaction/releases/latest), or from the [game page](https://tanximsiam.github.io/Chain-Reaction/).
-
-- **Windows**: download `ChainReaction-windows.exe` and run it. SmartScreen may warn because the exe is unsigned: choose *More info → Run anyway*.
-- **Linux**: download `ChainReaction-linux.tar.gz`, then `tar -xzf ChainReaction-linux.tar.gz && ./ChainReaction`. Needs OpenGL 3.3.
-
-## Rules
-
-- Players take turns adding an atom to an empty cell or one of their own.
-- A cell explodes when it holds as many atoms as it has neighbours (corner 2, edge 3, middle 4),
-  sending one atom to each neighbour and capturing those cells.
-- Explosions chain. A player with no atoms left (after their first move) is out.
-- The last player with atoms wins.
-
-## Run
-
-```bash
-python -m venv venv
-venv/bin/pip install -r requirements.txt   # Windows: venv\Scripts\pip
-venv/bin/python main.py
-```
-
-### Live preview (development)
-
-```bash
-venv/bin/python tools/live_preview.py
-```
-
-Open http://localhost:8765 to play the game in a browser. It restarts whenever a `.py` file changes.
-
-## Controls
-
-| Where | Input | Action |
+| Platform | File | How to run |
 |---|---|---|
-| Menu | Click / Left, Right / 2-8 | Choose player count |
+| Windows | [`ChainReaction-windows.exe`](https://github.com/tanximsiam/Chain-Reaction/releases/latest/download/ChainReaction-windows.exe) (19 MB) | Double-click. The exe isn't code-signed, so SmartScreen may warn: choose *More info → Run anyway*. |
+| Linux | [`ChainReaction-linux.tar.gz`](https://github.com/tanximsiam/Chain-Reaction/releases/latest/download/ChainReaction-linux.tar.gz) (39 MB) | `tar -xzf ChainReaction-linux.tar.gz && ./ChainReaction`. Needs OpenGL 3.3. |
+
+Nothing to install. Every version is on the [releases page](https://github.com/tanximsiam/Chain-Reaction/releases).
+
+## How to play
+
+1. On your turn, add one atom to an empty cell or one of your own.
+2. A cell bursts when it holds as many atoms as it has neighbours: **2 in a corner, 3 on an edge, 4 in the middle**.
+3. A burst sends one atom to each neighbour, and every cell it lands in becomes yours.
+4. Neighbours that fill up burst too, so one move can run right across the board.
+5. After your first move, losing every atom knocks you out. The last colour standing wins.
+
+The in-game **How to play** screen shows each rule with an animated demo board.
+
+| Where | Key | Action |
+|---|---|---|
+| Menu | Click, Left / Right, or 2 to 8 | Choose the number of players |
 | Menu | Enter or Space | Start |
 | Game | Click a cell | Place an atom |
 | Game | R | Restart |
-| Game | Esc or P | Pause / resume (pause menu: Resume, Main menu, Exit to desktop, Sound, Music) |
+| Game | Esc or P | Pause menu: Resume, Main menu, Exit to desktop, Sound, Music |
 
-## Code layout
+## Run from source
 
-| File | Responsibility |
+Needs Python 3.12.
+
+```bash
+python -m venv venv
+venv/bin/pip install -r requirements.txt
+venv/bin/python main.py
+```
+
+On Windows use `venv\Scripts\pip` and `venv\Scripts\python` instead.
+
+## Development
+
+| Task | Command |
 |---|---|
+| Tests | `venv/bin/python -m unittest test_board` |
+| Live preview | `venv/bin/python tools/live_preview.py`, then open http://localhost:8765. It runs the game in a browser tab and restarts whenever a `.py` file changes. |
+| Build a binary | `venv/bin/pip install pyinstaller`, then `venv/bin/pyinstaller --noconfirm ChainReaction.spec`. The one-file binary lands in `dist/`. |
+| Release | Push a tag like `v1.1.0`. [`release.yml`](.github/workflows/release.yml) runs the tests, builds Windows and Linux binaries and publishes a release. |
+| Website | Edit `site/`. [`pages.yml`](.github/workflows/pages.yml) publishes it to GitHub Pages when it changes on `main`. |
+
+Work happens on feature branches merged into `dev` through pull requests; `dev` is merged into `main` for releases.
+
+### Project layout
+
+| Path | What it holds |
+|---|---|
+| `main.py` | Entry point: window, icon, start menu |
 | `board.py` | Game rules only: board, explosion waves, turns, elimination |
-| `board_sprites.py` | `BoardSprites`: tiles, atoms and explosion animation for any Board, at any size |
-| `game_view.py` | Game flow, HUD and game-over panel |
-| `menu_view.py` | Start menu (players, Play, sound/music, How to play, Quit) |
-| `manual_view.py` | How to play, with looping demo boards (critical mass, capture, chain) |
+| `board_sprites.py` | `BoardSprites`: tiles, atoms and explosion animation for any board, at any size |
+| `game_view.py` | Game screen: input, turns, HUD, pause menu, game over |
+| `menu_view.py` | Start menu |
+| `manual_view.py` | How to play, with looping demo boards |
+| `widgets.py` | `BevelButton` (rounded, bevelled, animated), tooltips, panels, audio toggles |
 | `ui_theme.py` | Fonts, colours and rounded nine-patch textures |
-| `widgets.py` | `BevelButton` (animated bevelled button) and rounded panels |
+| `icons.py` | Stroke icon set, drawn once with Pillow |
 | `audio.py` | Sound effects, music and their on/off settings |
-| `icons.py` | Stroke icon set rendered once with PIL |
-| `constants.py` | Board size, layout and colours |
+| `constants.py` | Board size, layout, timings and player colours |
+| `test_board.py` | Unit tests for the rules |
+| `assets/` | App icon (`.png` for the window, `.ico` for the exe) |
+| `ChainReaction.spec` | PyInstaller build settings |
+| `site/` | The GitHub Pages download site, with a playable mini board |
+| `tools/` | Live browser preview for development |
 
-## Build
+## Credits
 
-```bash
-venv/bin/pip install pyinstaller
-venv/bin/pyinstaller --noconfirm ChainReaction.spec   # one-file binary in dist/
-```
-
-Pushing a tag like `v1.0.0` runs `.github/workflows/release.yml`, which builds Windows and Linux binaries and attaches them to a GitHub release.
-
-## Tests
-
-```bash
-python -m unittest test_board
-```
+- Built with [Python Arcade](https://api.arcade.academy/) (MIT).
+- Sound effects, music and the Kenney Future font by [Kenney](https://kenney.nl/) (CC0), bundled with Arcade.
+- Text set in [Liberation Sans](https://github.com/liberationfonts/liberation-fonts) (SIL Open Font License).
