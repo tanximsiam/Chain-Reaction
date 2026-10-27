@@ -3,6 +3,18 @@
   src: url("fonts/Kenney_Future.ttf") format("truetype");
   font-display: swap;
 }
+@font-face {
+  font-family: "Liberation Sans";
+  src: url("fonts/Liberation_Sans_Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Liberation Sans";
+  src: url("fonts/Liberation_Sans_Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+}
 
 :root {
   /* The game's own palette (Tailwind slate + red). */
@@ -28,8 +40,8 @@
   --radius: 14px;
 
   --display: "Kenney Future", "Liberation Sans", Arial, sans-serif;
-  /* Arial first: Liberation Sans, the game's face, is metric-identical and is what Arial maps to on Linux. */
-  --text: Arial, "Liberation Sans", Helvetica, sans-serif;
+  /* Both faces ship with the site, so the page matches the game on every OS. */
+  --text: "Liberation Sans", Arial, Helvetica, sans-serif;
   /* Kenney Future is very wide (about 0.9em per letter), so display sizes sit lower than usual. */
   --step-1: clamp(40px, 5.4vw, 88px);
   --step-2: clamp(30px, 3.6vw, 60px);
