@@ -25,10 +25,11 @@ ATOM_TEXTURE = shape_texture("atom", ATOM_RADIUS * 2, lambda d, s: d.ellipse((0,
 
 
 class BoardSprites:
-    def __init__(self, board, left, bottom, cell_size=CELL_SIZE, gap=CELL_GAP):
+    def __init__(self, board, left, bottom, cell_size=CELL_SIZE, gap=CELL_GAP, tile_color=CELL_COLOR):
         self.board = board
         self.cell_size = cell_size
         self.gap = gap
+        self.tile_color = tile_color
         self.scale = cell_size / CELL_SIZE
         self.time = 0.0
         self.flights = []
@@ -112,7 +113,7 @@ class BoardSprites:
         # Opaque blend: an RGB colour set later keeps a sprite's old alpha, so a translucent tint would stick.
         for i, tile in enumerate(self.tiles):
             lit = self.highlight and divmod(i, self.board.cols) == self.highlight[0]
-            color = lerp(CELL_COLOR, PLAYER_COLORS[self.highlight[1]], 0.3) if lit else CELL_COLOR
+            color = lerp(self.tile_color, PLAYER_COLORS[self.highlight[1]], 0.3) if lit else self.tile_color
             tile.color = (*color, 255)
 
     def start_wave(self):

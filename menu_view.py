@@ -2,6 +2,7 @@ import arcade
 import arcade.gui as gui
 
 from constants import MARGIN, MUTED_TEXT, PLAYER_COLORS
+from manual_view import ManualView
 from ui_theme import FONT, TITLE_FONT, TEXT
 from widgets import BevelButton, Tooltip, audio_toggle
 
@@ -41,10 +42,20 @@ class MenuView(gui.UIView):
         toggles = [corner.add(audio_toggle(kind, width=42, height=42)) for kind in ("sound", "music")]
         root.add(corner, anchor_x="left", anchor_y="top", align_x=MARGIN, align_y=-MARGIN + 4)
         self.tooltip = root.add(Tooltip(toggles), anchor_x="left", anchor_y="top", align_x=MARGIN, align_y=-72)
+
+        corner = gui.UIBoxLayout(vertical=False, space_between=8)
+        actions = [corner.add(BevelButton(icon="help", width=42, height=42, tooltip="How to play")),
+                   corner.add(BevelButton(icon="exit", width=42, height=42, tooltip="Quit"))]
+        actions[0].on_click = lambda event: self.window.show_view(ManualView(self))
+        actions[1].on_click = lambda event: arcade.exit()
+        root.add(corner, anchor_x="right", anchor_y="top", align_x=-MARGIN, align_y=-MARGIN + 4)
+        self.action_tooltip = root.add(Tooltip(actions), anchor_x="right", anchor_y="top",
+                                       align_x=-MARGIN, align_y=-72)
         self.select(players)
 
     def on_update(self, delta_time):
         self.tooltip.refresh()
+        self.action_tooltip.refresh()
 
     def select(self, n):
         self.players = n
