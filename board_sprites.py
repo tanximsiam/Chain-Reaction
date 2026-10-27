@@ -120,8 +120,10 @@ class BoardSprites:
         """Pop every unstable cell and start flying its atoms to the neighbours."""
         self.flights = self.board.start_wave()
         self.flight_time = 0.0
-        for _, _, player in self.flights:
-            self.flying.append(self.atom_sprite(player))
+        for src, _, player in self.flights:
+            sprite = self.atom_sprite(player)
+            sprite.position = self.cell_center(*src)  # else it is drawn at (0, 0) until the next update
+            self.flying.append(sprite)
         self.sync()
 
     def update(self, dt):
