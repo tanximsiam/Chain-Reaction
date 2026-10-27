@@ -45,6 +45,7 @@ Open http://localhost:8765 to play the game in a browser. It restarts whenever a
 | `menu_view.py` | Start menu |
 | `ui_theme.py` | Fonts, colours and rounded nine-patch textures |
 | `widgets.py` | `BevelButton` (animated bevelled button) and rounded panels |
+| `audio.py` | Sound effects, music and their on/off settings |
 | `icons.py` | Stroke icon set rendered once with PIL |
 | `constants.py` | Board size, layout and colours |
 
