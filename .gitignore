@@ -21,3 +21,6 @@ dev_runner.py
 # PyInstaller output
 build/
 dist/
+
+# Local design-tool settings
+.impeccable/

@@ -96,4 +96,4 @@ Work happens on feature branches merged into `dev` through pull requests; `dev` 
 
 - Built with [Python Arcade](https://api.arcade.academy/) (MIT).
 - Sound effects, music and the Kenney Future font by [Kenney](https://kenney.nl/) (CC0), bundled with Arcade.
-- Text set in [Liberation Sans](https://github.com/liberationfonts/liberation-fonts) (SIL Open Font License).
+- Text set in [Rubik](https://github.com/googlefonts/rubik) (SIL Open Font License, see `assets/fonts/OFL.txt`).
