@@ -9,7 +9,7 @@ from ui_theme import FONT, INK, VARIANTS, WHITE, lerp, rounded_patch
 DEPTH = 4                         # resting height of the face above its lip, in px
 STIFFNESS, DAMPING = 900.0, 26.0  # underdamped spring: the face overshoots a little on release
 PRESS_KICK = -260.0               # px/s; makes even a very fast click visibly sink
-CAP_HEIGHT = 0.69                 # Liberation Sans cap height, in em
+CAP_HEIGHT = 0.70                 # Rubik cap height, in em
 ICON_GAP = 8
 
 
